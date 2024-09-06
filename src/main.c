@@ -24,25 +24,56 @@ For a C++ project simply rename the file to .cpp and re-run the build script
 
 */
 
+#include <stdio.h>
 #include "raylib.h"
+#include "raymath.h"
+
+typedef struct Player {
+	Vector2 position;
+	float speed;
+} Player;
 
 int main(void) {
-	const int screen_width = 800;
-	const int screen_height = 450;
+	const int screenWidth = 800;
+	const int screenHeight = 450;
 
-	InitWindow(screen_width, screen_height, "intent");
+	InitWindow(screenWidth, screenHeight, "intent");
+
+	Player player = { 0 };
+	player.position = (Vector2){ (float)screenWidth/2, (float)screenHeight/2 };
+	player.speed = 25.0f;
+
+	Image image = LoadImage("resources/player.png");
+	Texture texture = LoadTextureFromImage(image);
+	UnloadImage(image);
 
 	SetTargetFPS(60);
 
 	while (!WindowShouldClose()) {
+		Vector2 inputDirection = { 0, 0 };
+		float deltaTime = GetFrameTime();
+
+		if (IsKeyDown(KEY_RIGHT)) inputDirection.x += 1.0f;
+		if (IsKeyDown(KEY_LEFT)) inputDirection.x -= 1.0f;
+		if (IsKeyDown(KEY_UP)) inputDirection.y -= 1.0f;
+		if (IsKeyDown(KEY_DOWN)) inputDirection.y += 1.0f;
+		
+		inputDirection = Vector2Normalize(inputDirection);
+
+		player.position = Vector2Add(player.position, Vector2Scale(inputDirection, player.speed*deltaTime));
+		
 		BeginDrawing();
 
-			ClearBackground(RAYWHITE);
+			Color STEELGRAY = {0x22, 0x20, 0x34, 0xff};
 
-			DrawText("Hello, World!", 190, 200, 20, LIGHTGRAY);
-			
+			ClearBackground(STEELGRAY);
+
+			DrawTexture(texture, player.position.x, player.position.y, WHITE);
+
 		EndDrawing();
 	}
+
+	UnloadTexture(texture);
 
 	CloseWindow();
 
