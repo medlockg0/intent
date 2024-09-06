@@ -34,8 +34,8 @@ typedef struct Player {
 } Player;
 
 int main(void) {
-	const int screenWidth = 800;
-	const int screenHeight = 450;
+	const int screenWidth = 1280;
+	const int screenHeight = 720;
 
 	InitWindow(screenWidth, screenHeight, "intent");
 
@@ -46,6 +46,12 @@ int main(void) {
 	Image image = LoadImage("resources/player.png");
 	Texture texture = LoadTextureFromImage(image);
 	UnloadImage(image);
+
+	Camera2D camera = { 0 };
+	camera.offset = (Vector2){ (float)screenWidth/2, (float)screenHeight/2 };
+	camera.target = (Vector2){ player.position.x, player.position.y };
+	camera.rotation = 0.0f;
+	camera.zoom = 5.3f;
 
 	SetTargetFPS(60);
 
@@ -64,11 +70,18 @@ int main(void) {
 		
 		BeginDrawing();
 
-			Color STEELGRAY = {0x22, 0x20, 0x34, 0xff};
+			Color STEELGRAY = { 0x22, 0x20, 0x34, 0xff };
 
 			ClearBackground(STEELGRAY);
 
-			DrawTexture(texture, player.position.x, player.position.y, WHITE);
+			BeginMode2D(camera);
+
+				DrawTexturePro(texture, (Rectangle){ 0, 0, texture.width, texture.height }, (Rectangle){ player.position.x, player.position.y, texture.width, texture.height }, (Vector2){ (float)texture.width/2, texture.height }, 0.0f, WHITE);
+
+				//DrawLine((int)camera.target.x, 0, (int)camera.target.x, screenHeight, BLACK);
+				//DrawLine(0, (int)camera.target.y, screenWidth, (int)camera.target.y, BLACK);
+			
+			EndMode2D();
 
 		EndDrawing();
 	}
